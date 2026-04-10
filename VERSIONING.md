@@ -47,6 +47,45 @@ there is no build, so there is no quality decision to reflect.
 
 ---
 
+## When to bump VERSION
+
+`VERSION` is bumped manually, by a human, as a deliberate statement of intent.
+It is not bumped automatically on every PR or commit.
+
+**PRs do not touch `VERSION`.** Feature branches do their work; `VERSION` is
+only changed when someone decides "this body of work is worth a new number."
+That is a judgement call, not a mechanical response to a merge.
+
+The bump happens as its own commit, typically right before or at the point of
+release. Until then, every commit in development is identified by the current
+`VERSION` plus its git SHA — e.g. `0.2+g4a1bc3f` — which is already unique
+and traceable.
+
+### Does a bump always mean a release?
+
+No. You can bump `VERSION` to `0.2` and keep developing on it for weeks or
+months before shipping. The bump expresses *intent* ("we are working toward
+0.2"), not *completion*. The release is a separate act.
+
+```
+bump VERSION to 0.2
+      │
+      ├── commit (0.2+gabc1234)
+      ├── commit (0.2+g5def678)
+      ├── PR merged (0.2+g9abc012)
+      ├── PR merged (0.2+g3def456)
+      │
+      └── python scripts/release.py   ← "0.2 is now shipped"
+```
+
+### Multi-person projects
+
+With multiple contributors, the same rule applies — `VERSION` is not touched
+in feature PRs. The person cutting the release bumps it in a release commit.
+There are no merge conflicts over `VERSION` because nobody else is touching it.
+
+---
+
 ## How `pip install -e .` works
 
 Running `pip install -e .` triggers the PEP 517 build backend once. The wheel
@@ -154,9 +193,9 @@ when `.git` is present (development only). A shipped wheel never calls git.
 
 ### `VERSION` file as the single version source of truth
 
-The base version (`MAJOR.MINOR`, e.g. `0.1`) lives in a committed `VERSION`
-file. It is read by setuptools for wheel metadata and by `__init__.py` for
-the live version string. No version strings anywhere else.
+The base version (`MAJOR.MINOR.PATCH`, e.g. `0.1.0`) lives in a committed
+`VERSION` file. It is read by setuptools for wheel metadata and by
+`__init__.py` for the live version string. No version strings anywhere else.
 
 ### No tags required
 
@@ -192,10 +231,10 @@ this clearly rather than using a sentinel like `datetime.min`.
 
 | Scenario | Example | How |
 |---|---|---|
-| Development (`.git` present) | `0.1+g701e4ca` | `VERSION` + git SHA |
-| Artifact — `stable` | `0.1` | `VERSION` as-is |
-| Artifact — `rc` | `0.1rc1` | `VERSION` + `rc1` suffix |
-| Artifact — `dev` | `0.1.dev0` | `VERSION` + `.dev0` suffix |
+| Development (`.git` present) | `0.1.0+g701e4ca` | `VERSION` + git SHA |
+| Artifact — `stable` | `0.1.0` | `VERSION` as-is |
+| Artifact — `rc` | `0.1.0rc1` | `VERSION` + `rc1` suffix |
+| Artifact — `dev` | `0.1.0.dev0` | `VERSION` + `.dev0` suffix |
 
 `RELEASE_TYPE` (default: `dev`) controls which artifact format is used.
 
@@ -205,7 +244,7 @@ this clearly rather than using a sentinel like `datetime.min`.
 
 | File | Purpose |
 |---|---|
-| `VERSION` | Committed base version (`MAJOR.MINOR`) — the only file you edit when bumping |
+| `VERSION` | Committed base version (`MAJOR.MINOR.PATCH`) — the only file you edit when bumping |
 | `rsync_server/_version.json` | Generated at build time; gitignored; carries runtime metadata for shipped artifacts |
 | `rsync_server/__init__.py` | Public runtime API — branches on `.git` presence |
 | `_build_backend.py` | Custom PEP 517 wrapper — writes `_version.json` before the wheel/sdist is assembled |
