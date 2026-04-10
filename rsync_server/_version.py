@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 _json = Path(__file__).parent / "_version.json"
+
 __version__: str = (
     json.loads(_json.read_text(encoding="utf-8"))["version"]
     if _json.exists()
