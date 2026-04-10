@@ -124,4 +124,3 @@ def build_editable(wheel_directory, config_settings=None, metadata_directory=Non
 
     _write_version_file()
     return _build_editable(wheel_directory, config_settings, metadata_directory)
-
