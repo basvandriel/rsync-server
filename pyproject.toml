@@ -1,19 +1,31 @@
 [project]
 name = "rsync-server"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A modern lightweight Python wrapper for an rsync daemon."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = [
-    "ruff>=0.15.10",
-]
+dependencies = []
 
 [project.scripts]
 rsync-server = "main:main"
 
+[dependency-groups]
+dev = [
+    "build>=1.4.2",
+    "ruff>=0.15.10",
+    "wheel>=0.46.3",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "rsync_server._version.__version__"}
+
+[tool.setuptools.package-data]
+rsync_server = ["_version.json"]
+
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["setuptools>=64.0", "wheel"]
+build-backend = "_build_backend"
+backend-path = ["."]
 
 [tool.setuptools.packages.find]
 where = ["."]

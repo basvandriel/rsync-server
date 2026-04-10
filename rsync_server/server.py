@@ -8,10 +8,11 @@ import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import IO, Optional
+from urllib.parse import ParseResult
 
 from .config import RsyncConfigBuilder
-from .constants import DEFAULT_MODULE_NAME, SUPPORTED_RSYNC_VERSION
+from .constants import DEFAULT_MODULE_NAME, DEFAULT_PORT, SUPPORTED_RSYNC_VERSION
 from .runtime import RsyncRuntime
 
 
@@ -75,7 +76,7 @@ class RsyncServer:
             max_connections=self.max_connections,
             extra_config=self.extra_config,
         )
-        self._log_handle: Optional[object] = None
+        self._log_handle: Optional[IO[str]] = None
         self._process: Optional[subprocess.Popen[bytes]] = None
 
         self._ensure_module_paths()
@@ -254,9 +255,17 @@ class RsyncServer:
             f"Failed to start rsync daemon on {self.host}:{self.port} within {timeout} seconds"
         )
 
-    def module_url(self, module_name: str = DEFAULT_MODULE_NAME) -> str:
+    def module_url(self, module_name: Optional[str] = None) -> ParseResult:
+        name = module_name or self.modules[0].name
         host = "localhost" if self.host in {"0.0.0.0", ""} else self.host
-        return f"rsync://{host}:{self.port}/{module_name}"
+        return ParseResult(
+            scheme="rsync",
+            netloc=f"{host}:{self.port}",
+            path=f"/{name}",
+            params="",
+            query="",
+            fragment="",
+        )
 
     @property
     def is_running(self) -> bool:
@@ -269,5 +278,10 @@ class RsyncServer:
         self.start()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: object,
+    ) -> None:
         self.cleanup()

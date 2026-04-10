@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 
 from rsync_server import RsyncModule, RsyncServer
+from rsync_server.constants import DEFAULT_PORT
 
 
 def parse_args() -> argparse.Namespace:
@@ -18,7 +19,10 @@ def parse_args() -> argparse.Namespace:
         "--host", default="127.0.0.1", help="Bind address for the rsync daemon."
     )
     parser.add_argument(
-        "--port", type=int, default=0, help="Port to use (0 selects a free port)."
+        "--port",
+        type=int,
+        default=DEFAULT_PORT,
+        help="Port to use (0 selects a free port).",
     )
     parser.add_argument(
         "--write", action="store_true", help="Allow write access to the root module."
@@ -48,13 +52,13 @@ def main() -> None:
         modules=[module],
         host=args.host,
         port=args.port,
-        log_file=args.log,
+        log_file=Path(args.log) if args.log else None,
         max_connections=args.max_connections,
     )
 
     with server:
         print("Rsync server is running")
-        print(f"Module URL: {server.module_url(module.name)}")
+        print(f"Module URL: {server.module_url(module.name).geturl()}")
         try:
             while True:
                 time.sleep(3600)
