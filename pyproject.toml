@@ -1,0 +1,20 @@
+[project]
+name = "rsync-server"
+version = "0.1.0"
+description = "A modern lightweight Python wrapper for an rsync daemon."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ruff>=0.15.10",
+]
+
+[project.scripts]
+rsync-server = "main:main"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["rsync_server*"]
