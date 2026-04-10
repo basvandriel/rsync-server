@@ -95,21 +95,12 @@ def _write_version_file() -> None:
     base = _read_base_version()
     version = _build_version_string(quality, base)
 
-    dirty_output = subprocess.run(
-        ["git", "status", "--porcelain"],
-        capture_output=True,
-        text=True,
-        check=False,
-    ).stdout.strip()
-
     _VERSION_FILE.write_text(
         json.dumps(
             {
                 "version": version,
                 "quality": quality,
                 "commit": commit,
-                "branch": _git("rev-parse", "--abbrev-ref", "HEAD"),
-                "dirty": bool(dirty_output),
                 "build_date": datetime.now(timezone.utc).isoformat(),
             },
             indent=2,

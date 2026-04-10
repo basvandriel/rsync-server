@@ -1,6 +1,8 @@
 import json
-from datetime import datetime
+import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from .server import RsyncModule, RsyncServer
 
@@ -11,16 +13,24 @@ if _json.exists():
     __version__: str = _meta["version"]
     __quality__: str = _meta["quality"]
     __commit__: str = _meta["commit"]
-    __branch__: str = _meta["branch"]
-    __dirty__: bool = _meta["dirty"]
-    __build_date__: datetime = datetime.fromisoformat(_meta["build_date"])
+    __build_date__: Optional[datetime] = datetime.fromisoformat(_meta["build_date"])
 else:
-    # Running from source — no build has been run yet.
-    __version__ = "dev"
+    # Running from source — compute live from git.
+    def _git(*args: str) -> str:
+        try:
+            return subprocess.check_output(
+                ["git", *args], stderr=subprocess.DEVNULL, text=True
+            ).strip()
+        except Exception:
+            return "unknown"
+
+    _base = (
+        (Path(__file__).parent.parent / "VERSION").read_text(encoding="utf-8").strip()
+    )
+    _sha = _git("rev-parse", "--short", "HEAD")
+    __version__ = f"{_base}+g{_sha}" if _sha != "unknown" else f"{_base}.dev0"
     __quality__ = "dev"
-    __commit__ = "unknown"
-    __branch__ = "unknown"
-    __dirty__ = False
-    __build_date__ = datetime.min
+    __commit__ = _sha
+    __build_date__: Optional[datetime] = None
 
 __all__ = ["RsyncModule", "RsyncServer"]
