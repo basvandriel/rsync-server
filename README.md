@@ -48,6 +48,13 @@ pip install -e .
 - `RsyncServer`: start, stop, and manage the daemon lifecycle
 - `RsyncModule`: describe an rsync module and access controls
 
+## Examples
+
+See `examples/` for runnable usage examples:
+
+- `examples/basic_server.py`
+- `examples/secure_server.py`
+
 ## Testing
 
 ```bash

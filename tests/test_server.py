@@ -1,10 +1,30 @@
+import re
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from rsync_server import RsyncModule, RsyncServer
+
+
+def _rsync_version_ok() -> bool:
+    path = shutil.which("rsync")
+    if path is None:
+        return False
+
+    result = subprocess.run([path, "--version"], capture_output=True, text=True)
+    if result.returncode != 0:
+        return False
+
+    match = re.search(r"rsync\s+version\s+(\d+)\.(\d+)", result.stdout)
+    if not match:
+        return False
+
+    major = int(match.group(1))
+    minor = int(match.group(2))
+    return major > 3 or (major == 3 and minor >= 4)
 
 
 class TestRsyncServer(unittest.TestCase):
@@ -63,9 +83,18 @@ class TestRsyncServer(unittest.TestCase):
                 patch(
                     "rsync_server.server.shutil.which", return_value="/usr/bin/rsync"
                 ),
+                patch("rsync_server.server.subprocess.run") as mock_run,
                 patch("rsync_server.server.subprocess.Popen") as mock_popen,
                 patch.object(RsyncServer, "wait_for_ready", return_value=None),
             ):
+                process_mock = Mock()
+                process_mock.poll.return_value = None
+                mock_popen.return_value = process_mock
+                mock_result = Mock()
+                mock_result.returncode = 0
+                mock_result.stdout = "rsync  version 3.4.4  protocol version 31\n"
+                mock_run.return_value = mock_result
+                server.start()
                 process_mock = Mock()
                 process_mock.poll.return_value = None
                 mock_popen.return_value = process_mock
@@ -75,9 +104,36 @@ class TestRsyncServer(unittest.TestCase):
             self.assertTrue(log_file.exists())
             server.cleanup()
 
+    def test_rsync_version_check_accepts_3_4_plus(self):
+        with tempfile.TemporaryDirectory() as root_dir:
+            root = Path(root_dir)
+            server = RsyncServer(root)
+
+            result = Mock()
+            result.returncode = 0
+            result.stdout = "rsync  version 3.4.4  protocol version 31\n"
+
+            with patch("rsync_server.server.shutil.which", return_value="/usr/bin/rsync"), \
+                patch("rsync_server.server.subprocess.run", return_value=result):
+                server._ensure_rsync_installed()
+
+    def test_rsync_version_check_rejects_old_version(self):
+        with tempfile.TemporaryDirectory() as root_dir:
+            root = Path(root_dir)
+            server = RsyncServer(root)
+
+            result = Mock()
+            result.returncode = 0
+            result.stdout = "rsync  version 3.3.2  protocol version 31\n"
+
+            with patch("rsync_server.server.shutil.which", return_value="/usr/bin/rsync"), \
+                patch("rsync_server.server.subprocess.run", return_value=result):
+                with self.assertRaises(RuntimeError):
+                    server._ensure_rsync_installed()
+
     def test_server_start_stop_cycle(self):
-        if shutil.which("rsync") is None:
-            self.skipTest("rsync executable not available")
+        if not _rsync_version_ok():
+            self.skipTest("Installed rsync is not version 3.4.x or later")
 
         with tempfile.TemporaryDirectory() as root_dir:
             root = Path(root_dir)

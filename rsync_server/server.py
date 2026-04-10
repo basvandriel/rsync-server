@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import socket
 import subprocess
@@ -10,7 +11,7 @@ from pathlib import Path
 from typing import Optional
 
 from .config import RsyncConfigBuilder
-from .constants import DEFAULT_MODULE_NAME
+from .constants import DEFAULT_MODULE_NAME, SUPPORTED_RSYNC_VERSION
 from .runtime import RsyncRuntime
 
 
@@ -87,21 +88,52 @@ class RsyncServer:
                 )
 
     def _ensure_rsync_installed(self) -> None:
-        if self.rsync_executable.is_absolute():
-            if not self.rsync_executable.exists() or not os.access(
-                self.rsync_executable, os.X_OK
-            ):
-                raise RuntimeError(
-                    f"Unable to execute rsync at path: {self.rsync_executable}. "
-                    "Install rsync or provide a valid executable."
-                )
-            return
+        executable_path = self.rsync_executable
 
-        if shutil.which(str(self.rsync_executable)) is None:
+        if not self.rsync_executable.is_absolute():
+            resolved = shutil.which(str(self.rsync_executable))
+            if resolved is None:
+                raise RuntimeError(
+                    f"Unable to find rsync executable: {self.rsync_executable}. "
+                    "Install rsync or provide a valid path."
+                )
+            executable_path = Path(resolved)
+
+        if not executable_path.exists() or not os.access(executable_path, os.X_OK):
             raise RuntimeError(
-                f"Unable to find rsync executable: {self.rsync_executable}. "
-                "Install rsync or provide a valid path."
+                f"Unable to execute rsync at path: {executable_path}. "
+                "Install rsync or provide a valid executable."
             )
+
+        self._check_rsync_version(executable_path)
+
+    def _check_rsync_version(self, executable_path: Path) -> None:
+        major, minor, patch = self._get_rsync_version(executable_path)
+        if major < 3 or (major == 3 and minor < 4):
+            raise RuntimeError(
+                f"Unsupported rsync version {major}.{minor}.{patch}. "
+                f"This wrapper requires rsync {SUPPORTED_RSYNC_VERSION} or later."
+            )
+
+    def _get_rsync_version(self, executable_path: Path) -> tuple[int, int, int]:
+        result = subprocess.run(
+            [str(executable_path), "--version"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Failed to execute rsync for version check: {executable_path}"
+            )
+
+        match = re.search(r"rsync\s+version\s+(\d+)\.(\d+)\.(\d+)", result.stdout)
+        if not match:
+            raise RuntimeError(
+                f"Unable to parse rsync version from output: {result.stdout.splitlines()[0]}"
+            )
+
+        return int(match.group(1)), int(match.group(2)), int(match.group(3))
 
     def _prepare_runtime(self) -> None:
         if self._runtime.tmpdir is not None:
