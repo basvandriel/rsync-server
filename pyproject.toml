@@ -17,7 +17,7 @@ dev = [
 ]
 
 [tool.setuptools.dynamic]
-version = {attr = "rsync_server._version.__version__"}
+version = {file = "VERSION"}
 
 [tool.setuptools.package-data]
 rsync_server = ["_version.json"]
