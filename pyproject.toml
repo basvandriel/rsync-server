@@ -23,7 +23,7 @@ version = {file = "VERSION"}
 rsync_server = ["_version.json"]
 
 [build-system]
-requires = ["setuptools>=64.0", "wheel"]
+requires = ["setuptools>=64.0", "wheel", "buildstamp"]
 build-backend = "_build_backend"
 backend-path = ["."]
 
