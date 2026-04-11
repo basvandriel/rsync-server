@@ -10,6 +10,6 @@ wheels/
 .venv
 
 # Build-time generated — not committed
-rsync_server/_version.json
+rsync_server/_build.json
 
 wheelinspect
