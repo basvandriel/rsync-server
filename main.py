@@ -22,7 +22,7 @@ def parse_args() -> argparse.Namespace:
         "--port",
         type=int,
         default=DEFAULT_PORT,
-        help="Port to use (0 selects a free port).",
+        help=f"Port to use (default: {DEFAULT_PORT}; use 0 to select a free port).",
     )
     parser.add_argument(
         "--write", action="store_true", help="Allow write access to the root module."
