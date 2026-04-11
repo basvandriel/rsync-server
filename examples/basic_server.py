@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     with RsyncServer(root=share_path, host="127.0.0.1", port=0) as server:
         url = server.module_url()
-        print("Rsync module URL:", url)
+        print("Rsync module URL:", url.geturl())
         print("Syncing from server to", dest_path)
 
         result = subprocess.run(
