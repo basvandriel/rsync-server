@@ -20,14 +20,14 @@ wheels = [
 
 [[package]]
 name = "buildstamp"
-version = "0.4.2"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d9/75/9ba8b04174c86e942cd4953b8a4209bcd4dcf06c5210809a6ba270c0a3a5/buildstamp-0.4.2.tar.gz", hash = "sha256:92ebddf5785f2d9e20343640039f788871fce73d0ceb4bf056cfbaeca68c6986", size = 6794, upload-time = "2026-04-10T17:19:57.268Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1a/f2/21b458180028e217462df388a5673d9b999b0755b187bae055cfcda8c41b/buildstamp-0.5.1.tar.gz", hash = "sha256:49530c2af818096cd5dbec848a741271913872e8e570b19ef68f280b348bb352", size = 6724, upload-time = "2026-04-11T17:33:43.348Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/24/51/62ebaebe66b824d49e14bea186764a1655f6df4373a8c02d595c9b7e0c3b/buildstamp-0.4.2-py3-none-any.whl", hash = "sha256:8a39fef9ef83ae60600fff9d50c205fbcb6d480dc5ea93800d130bc4ae9d83c3", size = 6625, upload-time = "2026-04-10T17:19:56.019Z" },
+    { url = "https://files.pythonhosted.org/packages/2e/58/029abcf9c25cdaba9fa97c75d565edefd3ae63ac91ba84fd113a6ebbbc0e/buildstamp-0.5.1-py3-none-any.whl", hash = "sha256:f4b9046a69a4c92200e351b60e1f6305660c38954fba29a54b0fd2460e86f5c3", size = 6597, upload-time = "2026-04-11T17:33:42.008Z" },
 ]
 
 [[package]]
@@ -84,7 +84,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "buildstamp", specifier = ">=0.4.2" }]
+requires-dist = [{ name = "buildstamp", specifier = "==0.5.1" }]
 
 [package.metadata.requires-dev]
 dev = [

@@ -5,7 +5,7 @@ description = "A modern lightweight Python wrapper for an rsync daemon."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "buildstamp>=0.4.2",
+    "buildstamp==0.5.1",
 ]
 
 [project.scripts]
@@ -26,8 +26,7 @@ rsync_server = ["_version.json"]
 
 [build-system]
 requires = ["setuptools>=64.0", "wheel", "buildstamp"]
-build-backend = "_build_backend"
-backend-path = ["."]
+build-backend = "buildstamp.backend"
 
 [tool.setuptools.packages.find]
 where = ["."]
