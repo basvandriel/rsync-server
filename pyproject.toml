@@ -4,7 +4,9 @@ dynamic = ["version"]
 description = "A modern lightweight Python wrapper for an rsync daemon."
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "buildstamp>=0.4.2",
+]
 
 [project.scripts]
 rsync-server = "main:main"

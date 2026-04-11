@@ -19,6 +19,18 @@ wheels = [
 ]
 
 [[package]]
+name = "buildstamp"
+version = "0.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tomli", marker = "python_full_version < '3.11'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d9/75/9ba8b04174c86e942cd4953b8a4209bcd4dcf06c5210809a6ba270c0a3a5/buildstamp-0.4.2.tar.gz", hash = "sha256:92ebddf5785f2d9e20343640039f788871fce73d0ceb4bf056cfbaeca68c6986", size = 6794, upload-time = "2026-04-10T17:19:57.268Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/24/51/62ebaebe66b824d49e14bea186764a1655f6df4373a8c02d595c9b7e0c3b/buildstamp-0.4.2-py3-none-any.whl", hash = "sha256:8a39fef9ef83ae60600fff9d50c205fbcb6d480dc5ea93800d130bc4ae9d83c3", size = 6625, upload-time = "2026-04-10T17:19:56.019Z" },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -60,6 +72,9 @@ wheels = [
 [[package]]
 name = "rsync-server"
 source = { editable = "." }
+dependencies = [
+    { name = "buildstamp" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -69,6 +84,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "buildstamp", specifier = ">=0.4.2" }]
 
 [package.metadata.requires-dev]
 dev = [
