@@ -12,7 +12,7 @@ from typing import IO, Optional
 from urllib.parse import ParseResult
 
 from .config import RsyncConfigBuilder
-from .constants import DEFAULT_MODULE_NAME, DEFAULT_PORT, SUPPORTED_RSYNC_VERSION
+from .constants import DEFAULT_MODULE_NAME, SUPPORTED_RSYNC_VERSION
 from .runtime import RsyncRuntime
 
 
