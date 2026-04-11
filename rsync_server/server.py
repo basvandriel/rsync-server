@@ -6,6 +6,7 @@ import shutil
 import socket
 import subprocess
 import time
+import types
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import IO, Optional
@@ -255,7 +256,10 @@ class RsyncServer:
             f"Failed to start rsync daemon on {self.host}:{self.port} within {timeout} seconds"
         )
 
-    def module_url(self, module_name: Optional[str] = None) -> ParseResult:
+    def module_url(self, module_name: Optional[str] = None) -> str:
+        return self.module_url_parsed(module_name).geturl()
+
+    def module_url_parsed(self, module_name: Optional[str] = None) -> ParseResult:
         name = module_name or self.modules[0].name
         host = "localhost" if self.host in {"0.0.0.0", ""} else self.host
         return ParseResult(
@@ -282,6 +286,6 @@ class RsyncServer:
         self,
         exc_type: Optional[type[BaseException]],
         exc_value: Optional[BaseException],
-        traceback: object,
+        traceback: Optional[types.TracebackType],
     ) -> None:
         self.cleanup()

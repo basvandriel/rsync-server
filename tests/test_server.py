@@ -145,8 +145,11 @@ class TestRsyncServer(unittest.TestCase):
             server.start()
             self.assertTrue(server.is_running)
             url = server.module_url()
-            self.assertEqual(url.scheme, "rsync")
-            self.assertIn("data", url.path)
+            self.assertTrue(url.startswith("rsync://"))
+            self.assertIn("data", url)
+            parsed = server.module_url_parsed()
+            self.assertEqual(parsed.scheme, "rsync")
+            self.assertIn("data", parsed.path)
             server.cleanup()
 
 
