@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 
-from rsync_server import RsyncModule, RsyncServer
+from rsync_server import RsyncServer
 
 
 if __name__ == "__main__":
@@ -10,15 +10,13 @@ if __name__ == "__main__":
     dest_path = base_dir / "data-received"
     dest_path.mkdir(parents=True, exist_ok=True)
 
-    module = RsyncModule(name="data", path=share_path, read_only=True)
-
-    with RsyncServer(modules=[module], host="127.0.0.1", port=0) as server:
-        url = server.module_url("data")
+    with RsyncServer(root=share_path, host="127.0.0.1", port=0) as server:
+        url = server.module_url()
         print("Rsync module URL:", url)
         print("Syncing from server to", dest_path)
 
         result = subprocess.run(
-            ["rsync", "-av", f"{url}/", str(dest_path) + "/"],
+            ["rsync", "-av", url + "/", str(dest_path) + "/"],
             text=True,
         )
 

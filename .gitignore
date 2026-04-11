@@ -8,3 +8,8 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Build-time generated — not committed
+rsync_server/_build.json
+
+wheelinspect

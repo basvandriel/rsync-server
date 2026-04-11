@@ -95,10 +95,6 @@ class TestRsyncServer(unittest.TestCase):
                 mock_result.stdout = "rsync  version 3.4.4  protocol version 31\n"
                 mock_run.return_value = mock_result
                 server.start()
-                process_mock = Mock()
-                process_mock.poll.return_value = None
-                mock_popen.return_value = process_mock
-                server.start()
 
             self.assertTrue(log_dir.exists())
             self.assertTrue(log_file.exists())
@@ -113,8 +109,12 @@ class TestRsyncServer(unittest.TestCase):
             result.returncode = 0
             result.stdout = "rsync  version 3.4.4  protocol version 31\n"
 
-            with patch("rsync_server.server.shutil.which", return_value="/usr/bin/rsync"), \
-                patch("rsync_server.server.subprocess.run", return_value=result):
+            with (
+                patch(
+                    "rsync_server.server.shutil.which", return_value="/usr/bin/rsync"
+                ),
+                patch("rsync_server.server.subprocess.run", return_value=result),
+            ):
                 server._ensure_rsync_installed()
 
     def test_rsync_version_check_rejects_old_version(self):
@@ -126,8 +126,12 @@ class TestRsyncServer(unittest.TestCase):
             result.returncode = 0
             result.stdout = "rsync  version 3.3.2  protocol version 31\n"
 
-            with patch("rsync_server.server.shutil.which", return_value="/usr/bin/rsync"), \
-                patch("rsync_server.server.subprocess.run", return_value=result):
+            with (
+                patch(
+                    "rsync_server.server.shutil.which", return_value="/usr/bin/rsync"
+                ),
+                patch("rsync_server.server.subprocess.run", return_value=result),
+            ):
                 with self.assertRaises(RuntimeError):
                     server._ensure_rsync_installed()
 
@@ -140,7 +144,12 @@ class TestRsyncServer(unittest.TestCase):
             server = RsyncServer(root, port=0)
             server.start()
             self.assertTrue(server.is_running)
-            self.assertIn("rsync://", server.module_url())
+            url = server.module_url()
+            self.assertTrue(url.startswith("rsync://"))
+            self.assertIn("data", url)
+            parsed = server.module_url_parsed()
+            self.assertEqual(parsed.scheme, "rsync")
+            self.assertIn("data", parsed.path)
             server.cleanup()
 
 
