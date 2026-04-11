@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-rsync-server = "main:main"
+rsync-server = "rsync_server.cli:main"
 
 [dependency-groups]
 dev = [
